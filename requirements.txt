@@ -1,38 +1,7 @@
-# Requirements for Resumoid App
-
-# Core Python libraries
-asyncio
-
-# Streamlit for the web interface
-streamlit
-
-# PDF processing
-PyPDF2
-
-# Data manipulation and visualization
-pandas
-matplotlib
-
-# LangChain for LLM integration
-langchain
-
-# Pydantic for data validation and settings management
+streamlit 
+langchain 
+python-dotenv 
+PyPDF2 
+matplotlib 
 pydantic
-
-# Environment variable management
-python-dotenv
-
-# OpenAI API (used by LangChain)
-openai
-
-# Logging (usually part of Python's standard library, but listed for clarity)
-logging
-
-# Type hinting (part of Python's standard library in Python 3.5+)
-typing
-
-# Optional: for advanced Streamlit data grid functionality
-streamlit-aggrid
-
-# Optional: for more advanced chart creation
-plotly
+langchain_openai
