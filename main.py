@@ -105,7 +105,7 @@ def extract_info(resume: str):
     resume_info = parser.parse(resume_text)
     return resume_info
 
-def description_evaluation(resume, job_description): 
+def description_evaluation(resume, job_description):
     prompt_template = f"""You are an Resume Expert. Your job is to give feedback on the resume based on the provided job description.
     Be specific about the points.
     
@@ -127,8 +127,35 @@ def description_evaluation(resume, job_description):
     ONLY QUOTE THE INFORMATION PROVIDED IN THE RESUME. DO NOT MAKE UP INFORMATION WHICH IS NOT EXPLICITLY PROVIDED IN RESUME.
     RETURN THE RESPONSE IN MARKDOWN FORMAT IN BULLET POINTS.
     """
-    output = llm.invoke(prompt_template)
-    return output
+    output = llm.predict(prompt_template)  # Use llm.predict() here
+
+    # Parse the output to extract the sections and format them
+    try:
+        strengths_start = output.index("## Strengths:")
+        weaknesses_start = output.index("## Weaknesses:")
+        recommendations_start = output.index("## Recommendations to improve CV:")
+
+        strengths = output[strengths_start + len("## Strengths:"):weaknesses_start].strip().split("- ")
+        weaknesses = output[weaknesses_start + len("## Weaknesses:"):recommendations_start].strip().split("- ")
+        recommendations = output[recommendations_start + len("## Recommendations to improve CV:"):].strip().split("- ")
+
+        # Format the output
+        formatted_output = ""
+        if strengths:
+            formatted_output += "**Strengths:**\n"
+            for strength in strengths:
+                formatted_output += f"- {strength}\n"
+        if weaknesses:
+            formatted_output += "\n**Weaknesses:**\n"
+            for weakness in weaknesses:
+                formatted_output += f"- {weakness}\n"
+        if recommendations:
+            formatted_output += "\n**Recommendations to improve CV:**\n"
+            for recommendation in recommendations:
+                formatted_output += f"- {recommendation}\n"
+        return formatted_output
+    except ValueError:
+        return "Could not parse the feedback. Please check the prompt and try again."
 
 def llm_scoring(llm, resume_text, job_description):
     prompt = f"""
@@ -187,9 +214,6 @@ def main():
     st.set_page_config(layout="wide")
     st.title("Welcome to Resumoid 🤖")
     st.subheader("🌝 Your personal AI ATS!")
-
-    st.error(""" 🦺 Built by [Satvik](https://www.linkedin.com/in/satvik-paramkusham/). \n
-    Note: This is an alpha version. You may encounter bugs 🐞""")
 
     st.markdown("📄 Upload your resume and job role to get feedback in 2 minutes!")
 
@@ -254,7 +278,7 @@ def main():
 
         st.markdown("### Detailed Comments")
         feedback_jobdesc = description_evaluation(resume_text, job_description)
-        st.markdown(feedback_jobdesc)
+        st.markdown(feedback_jobdesc)  # Display the formatted output here
 
         st.markdown("### Suggestions")
         output = suggest_improvements(llm, resume_info.experience)
@@ -278,4 +302,4 @@ def main():
         Reach out to me at satvik@buildfastwithai.com""")
 
 if __name__ == '__main__':
-    main()
+    main() 
